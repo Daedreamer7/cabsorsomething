@@ -4,7 +4,7 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    host: 'cabsorsomething.concepts.concepts.com'
+    host: 'cabsorsomething.conceptsonconcepts.com'
   },
   build: {
     outDir: 'dist',
