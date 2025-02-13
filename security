@@ -1,0 +1,136 @@
+-- Enhanced Security Policies for Gentry's Cabinets HR System
+
+-- Employees table policies
+create policy "Employees can view their own record"
+    on public.employees for select
+    using (auth.uid()::text = id::text);
+
+create policy "HR managers can view all employee records"
+    on public.employees for select
+    using (exists (
+        select 1 from public.employees e
+        where e.id::text = auth.uid()
+        and e.department = 'HR'
+        and e.position like '%Manager%'
+    ));
+
+create policy "HR managers can insert employee records"
+    on public.employees for insert
+    with check (exists (
+        select 1 from public.employees e
+        where e.id::text = auth.uid()
+        and e.department = 'HR'
+        and e.position like '%Manager%'
+    ));
+
+create policy "HR managers can update employee records"
+    on public.employees for update
+    using (exists (
+        select 1 from public.employees e
+        where e.id::text = auth.uid()
+        and e.department = 'HR'
+        and e.position like '%Manager%'
+    ));
+
+-- Performance reviews policies
+create policy "Employees can view their own reviews"
+    on public.performance_reviews for select
+    using (employee_id::text = auth.uid());
+
+create policy "Managers can view their team's reviews"
+    on public.performance_reviews for select
+    using (exists (
+        select 1 from public.employees e
+        where e.manager_id::text = auth.uid()
+        and e.id = employee_id
+    ));
+
+-- Documents policies
+create policy "Users can view their own documents"
+    on public.documents for select
+    using (uploaded_by::text = auth.uid());
+
+create policy "HR can view all documents"
+    on public.documents for select
+    using (exists (
+        select 1 from public.employees e
+        where e.id::text = auth.uid()
+        and e.department = 'HR'
+    ));
+
+-- Role-based access control
+create type user_role as enum ('keyholder', 'admin', 'manager', 'employee');
+
+-- Add role column to employees if not exists
+alter table public.employees 
+add column if not exists role user_role default 'employee';
+
+-- Keyholder policies (highest access)
+create policy "keyholder_full_access"
+    on public.employees
+    using (auth.jwt() ->> 'role' = 'keyholder');
+
+-- Admin policies
+create policy "admin_read_all"
+    on public.employees for select
+    using (auth.jwt() ->> 'role' = 'admin');
+
+create policy "admin_modify_department"
+    on public.employees for update
+    using (auth.jwt() ->> 'role' = 'admin')
+    with check (department = old.department);
+
+-- Manager policies
+create policy "manager_view_team"
+    on public.employees for select
+    using (
+        auth.jwt() ->> 'role' = 'manager' 
+        and department = current_user_department()
+    );
+
+create policy "manager_update_team"
+    on public.employees for update
+    using (
+        auth.jwt() ->> 'role' = 'manager'
+        and department = current_user_department()
+    );
+
+-- Employee self-service policies
+create policy "employees_view_own_record"
+    on public.employees for select
+    using (auth.uid()::text = id::text);
+
+create policy "employees_update_own_basic_info"
+    on public.employees for update
+    using (auth.uid()::text = id::text)
+    with check (
+        -- Only allow updates to specific fields
+        (old.email = new.email) and
+        (old.role = new.role) and
+        (old.department = new.department) and
+        (old.salary = new.salary)
+    );
+
+-- Document security
+create policy "document_access_by_role"
+    on public.documents for select
+    using (
+        case auth.jwt() ->> 'role'
+            when 'keyholder' then true
+            when 'admin' then true
+            when 'manager' then department = current_user_department()
+            else uploaded_by::text = auth.uid()
+        end
+    );
+
+-- Helper function to get current user's department
+create or replace function current_user_department()
+returns text as $$
+begin
+    return (
+        select department 
+        from public.employees 
+        where id::text = auth.uid()
+    );
+end;
+$$ language plpgsql security definer;

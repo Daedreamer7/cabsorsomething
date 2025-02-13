@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/src/index.css">
+    <link rel="stylesheet" href="/src/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Dashboard - Concepts Plus</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card {
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .sales-stats {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6;
+            margin-bottom: 6;
+        }
+        .sales-chart-container {
+            grid-column: 1 / 9;
+        }
+        .sales-chart {
+            padding: 6;
+            background-color: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
+        <div class="flex justify-between items-center px-8 py-4">
+            <div class="flex items-center space-x-4">
+                <button id="menuToggle" class="text-gray-500 hover:text-gray-700" title="Toggle Menu" aria-label="Toggle Menu">
+                    <i class="fas fa-bars text-xl" aria-hidden="true"></i>
+                </button>
+                <h1 class="text-xl font-bold text-gray-800">Sales Dashboard</h1>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="relative">
+                    <input type="text" placeholder="Search deals..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                <button class="relative">
+                    <i class="fas fa-bell text-gray-500 text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                </button>
+                <div class="flex items-center space-x-3">
+                    <img src="https://ui-avatars.com/api/?name=Sales+Manager" alt="Profile" class="w-8 h-8 rounded-full">
+                    <span class="text-gray-700 font-medium">Sales Manager</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 px-8 py-6">
+        <!-- Sales Overview -->
+        <div class="sales-stats">
+            <div class="stat-card bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 rounded-lg bg-green-100">
+                        <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+                    </div>
+                    <span class="text-green-500 flex items-center">
+                        <i class="fas fa-arrow-up mr-1"></i>15%
+                    </span>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900">$892,453</h3>
+                <p class="text-sm text-gray-600">Total Revenue</p>
+            </div>
+            <div class="stat-card bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 rounded-lg bg-blue-100">
+                        <i class="fas fa-handshake text-blue-600 text-xl"></i>
+                    </div>
+                    <span class="text-green-500 flex items-center">
+                        <i class="fas fa-arrow-up mr-1"></i>8%
+                    </span>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900">164</h3>
+                <p class="text-sm text-gray-600">Deals Closed</p>
+            </div>
+            <div class="stat-card bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 rounded-lg bg-purple-100">
+                        <i class="fas fa-users text-purple-600 text-xl"></i>
+                    </div>
+                    <span class="text-green-500 flex items-center">
+                        <i class="fas fa-arrow-up mr-1"></i>12%
+                    </span>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900">2,845</h3>
+                <p class="text-sm text-gray-600">New Leads</p>
+            </div>
+            <div class="stat-card bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 rounded-lg bg-yellow-100">
+                        <i class="fas fa-chart-line text-yellow-600 text-xl"></i>
+                    </div>
+                    <span class="text-green-500 flex items-center">
+                        <i class="fas fa-arrow-up mr-1"></i>6%
+                    </span>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900">68%</h3>
+                <p class="text-sm text-gray-600">Conversion Rate</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-6">
+            <!-- Sales Chart -->
+            <div class="sales-chart-container">
+                <div class="sales-chart">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-semibold text-gray-900">Sales Performance</h2>
+                        <select id="periodFilter" name="periodFilter" title="Filter by Period" aria-label="Filter by Time Period">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>Last 90 days</option>
+                        </select>
+                    </div>
+                    <canvas id="salesChart" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Deals -->
+            <div class="col-span-4">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Top Deals</h2>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-sm font-medium text-gray-900">Office Building Design</h3>
+                                <span class="text-green-500 font-semibold">$245K</span>
+                            </div>
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span class="mr-2">Progress:</span>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 rounded-full h-2 w-75" role="progressbar" title="Project Progress" aria-label="Project Progress: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <span class="ml-2">75%</span>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-sm font-medium text-gray-900">Corporate HQ Renovation</h3>
+                                <span class="text-green-500 font-semibold">$180K</span>
+                            </div>
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span class="mr-2">Progress:</span>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 rounded-full h-2 w-60" role="progressbar" title="Project Progress" aria-label="Project Progress: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <span class="ml-2">60%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pipeline -->
+            <div class="col-span-8">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Sales Pipeline</h2>
+                    <div class="grid grid-cols-5 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">Lead Generation</h3>
+                            <div class="space-y-2">
+                                <div class="p-3 bg-white rounded border border-gray-200">
+                                    <p class="text-sm font-medium">Tech Park Project</p>
+                                    <p class="text-xs text-gray-500">$120K</p>
+                                </div>
+                                <div class="p-3 bg-white rounded border border-gray-200">
+                                    <p class="text-sm font-medium">Retail Complex</p>
+                                    <p class="text-xs text-gray-500">$85K</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">Qualification</h3>
+                            <div class="space-y-2">
+                                <div class="p-3 bg-white rounded border border-gray-200">
+                                    <p class="text-sm font-medium">Mall Renovation</p>
+                                    <p class="text-xs text-gray-500">$200K</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">Proposal</h3>
+                            <div class="space-y-2">
+                                <div class="p-3 bg-white rounded border border-gray-200">
+                                    <p class="text-sm font-medium">Office Tower</p>
+                                    <p class="text-xs text-gray-500">$350K</p>
+                                </div>
+                                <div class="p-3 bg-white rounded border border-gray-200">
+                                    <p class="text-sm font-medium">Hotel Complex</p>
+                                    <p class="text-xs text-gray-500">$280K</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">Negotiation</h3>
+                            <div class="space-y-2">
+                                <div class="p-3 bg-white rounded border border-gray-200">
+                                    <p class="text-sm font-medium">Corporate Campus</p>
+                                    <p class="text-xs text-gray-500">$500K</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-gray-900 mb-2">Closed Won</h3>
+                            <div class="space-y-2">
+                                <div class="p-3 bg-white rounded border border-gray-200">
+                                    <p class="text-sm font-medium">City Center</p>
+                                    <p class="text-xs text-gray-500">$450K</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Performance -->
+            <div class="col-span-4">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Team Performance</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                            <img src="https://ui-avatars.com/api/?name=John+Smith" alt="Sales Rep" class="w-10 h-10 rounded-full">
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-medium text-gray-900">John Smith</h3>
+                                    <span class="text-green-500 font-semibold">$320K</span>
+                                </div>
+                                <p class="text-xs text-gray-500">12 deals closed this month</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                            <img src="https://ui-avatars.com/api/?name=Sarah+Johnson" alt="Sales Rep" class="w-10 h-10 rounded-full">
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-medium text-gray-900">Sarah Johnson</h3>
+                                    <span class="text-green-500 font-semibold">$285K</span>
+                                </div>
+                                <p class="text-xs text-gray-500">10 deals closed this month</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Sidebar Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const mainContent = document.querySelector('main');
+        let sidebarOpen = true;
+
+        menuToggle.addEventListener('click', () => {
+            sidebarOpen = !sidebarOpen;
+            if (sidebarOpen) {
+                mainContent.style.marginLeft = '256px';
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        });
+
+        // Sales Chart
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Sales',
+                    data: [65, 59, 80, 81, 56, 55, 70],
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

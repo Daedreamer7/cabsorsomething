@@ -1,0 +1,81 @@
+{
+  "name": "fff",
+  "version": "0.1.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@radix-ui/react-switch": "^1.0.3",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "@tanstack/react-query": "^4.24.4",
+    "@wix/bookings": "^1.0.122",
+    "@wix/members": "^1.0.38",
+    "@wix/pricing-plans": "^1.0.17",
+    "@wix/redirects": "^1.0.13",
+    "@wix/sdk": "^1.5.0",
+    "chart.js": "^4.4.6",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "cookie": "^0.5.0",
+    "date-fns": "^2.29.3",
+    "flowbite": "^1.6.3",
+    "flowbite-react": "^0.4.4",
+    "js-cookie": "^3.0.1",
+    "jsurl": "^0.1.5",
+    "libraries": "^0.0.3",
+    "lucide-react": "^0.330.0",
+    "next": "^13.5.7",
+    "react": "18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-day-picker": "^8.5.1",
+    "react-dom": "18.2.0",
+    "react-icons": "^5.3.0",
+    "socket.io-client": "^4.7.2",
+    "tailwind-merge": "^2.2.0",
+    "tailwindcss-animate": "^1.0.7",
+    "tailwinds": "^0.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.34.3",
+    "@types/cookie": "^0.5.1",
+    "@types/google.maps": "^3.55.3",
+    "@types/js-cookie": "^3.0.3",
+    "@types/node": "18.13.0",
+    "@types/react": "18.0.27",
+    "@types/react-dom": "18.0.10",
+    "autoprefixer": "^10.4.13",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^13.4.9",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "postcss": "^8.4.21",
+    "prettier": "^2.8.8",
+    "tailwindcss": "^3.2.6",
+    "typescript": "4.9.5",
+    "vite": "^6.1.0"
+  },
+  "packageManager": "yarn@3.3.0",
+  "description": "business app",
+  "main": "home",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "wix-fitness-nextjs"
+  },
+  "keywords": [
+    "concepts+",
+    "integrations.navarre",
+    "florida"
+  ],
+  "author": "Concepts+",
+  "license": "SEE LICENSE IN concepts_license"
+}

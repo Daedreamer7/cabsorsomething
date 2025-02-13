@@ -1,0 +1,75 @@
+-- Advanced Triggers and Functions
+
+-- Function to notify on employee status change
+create or replace function notify_employee_status_change()
+returns trigger as $$
+begin
+    insert into public.notifications (
+        type,
+        title,
+        message,
+        recipient_id
+    ) values (
+        'status_change',
+        'Employee Status Update',
+        format('Your status has been updated to %s', NEW.status),
+        NEW.id
+    );
+    return NEW;
+end;
+$$ language plpgsql;
+
+create trigger employee_status_change_trigger
+    after update of status on public.employees
+    for each row
+    execute function notify_employee_status_change();
+
+-- Function to automatically assign training programs to new employees
+create or replace function assign_default_training()
+returns trigger as $$
+begin
+    insert into public.employee_training (
+        employee_id,
+        program_id,
+        start_date
+    )
+    select 
+        NEW.id,
+        id,
+        current_date
+    from public.training_programs
+    where name = 'New Employee Orientation';
+    return NEW;
+end;
+$$ language plpgsql;
+
+create trigger new_employee_training_trigger
+    after insert on public.employees
+    for each row
+    execute function assign_default_training();
+
+-- Function to track review deadlines
+create or replace function check_review_deadlines()
+returns trigger as $$
+begin
+    if NEW.review_period_end < current_date and NEW.status = 'pending' then
+        insert into public.notifications (
+            type,
+            title,
+            message,
+            recipient_id
+        ) values (
+            'review_overdue',
+            'Performance Review Overdue',
+            'A performance review is past its deadline',
+            NEW.reviewer_id
+        );
+    end if;
+    return NEW;
+end;
+$$ language plpgsql;
+
+create trigger review_deadline_trigger
+    after insert or update on public.performance_reviews
+    for each row
+    execute function check_review_deadlines();

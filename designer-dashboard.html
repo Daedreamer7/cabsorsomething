@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designer Dashboard - Concepts Plus</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/src/index.css">
+    <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
+        <div class="flex justify-between items-center px-8 py-4">
+            <div class="flex items-center space-x-4">
+                <button id="menuToggle" class="text-gray-500 hover:text-gray-700" title="Toggle Menu" aria-label="Toggle Menu">
+                    <i class="fas fa-bars text-xl" aria-hidden="true"></i>
+                </button>
+                <h1 class="text-xl font-bold text-gray-800">Designer Dashboard</h1>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="relative">
+                    <input type="text" id="searchProjects" name="searchProjects" placeholder="Search projects..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label for="searchProjects" class="sr-only">Search projects</label>
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                <button class="relative">
+                    <i class="fas fa-bell text-gray-500 text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">5</span>
+                </button>
+                <div class="flex items-center space-x-3">
+                    <img src="https://ui-avatars.com/api/?name=Designer" alt="Profile" class="w-8 h-8 rounded-full">
+                    <span class="text-gray-700 font-medium">Sarah (Designer)</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 px-8 py-6">
+        <div class="grid grid-cols-12 gap-6">
+            <!-- Left Column -->
+            <div class="col-span-8 space-y-6">
+                <!-- Current Projects -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-semibold text-gray-900">Current Projects</h2>
+                        <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                            <i class="fas fa-plus mr-2"></i>New Project
+                        </button>
+                    </div>
+                    <div class="project-list">
+                        <!-- Project Card -->
+                        <div class="project-card bg-white border border-gray-200 rounded-lg p-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 class="text-md font-semibold text-gray-900">Office Building Design</h3>
+                                    <p class="text-sm text-gray-500">Client: ABC Corporation</p>
+                                </div>
+                                <span class="px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">In Progress</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Progress</span>
+                                    <span class="text-gray-900">75%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-500 rounded-full h-2 w-75" role="progressbar" title="Project Progress" aria-label="Project Progress: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex -space-x-2">
+                                        <img src="https://ui-avatars.com/api/?name=T1" alt="Team" class="w-6 h-6 rounded-full border-2 border-white">
+                                        <img src="https://ui-avatars.com/api/?name=T2" alt="Team" class="w-6 h-6 rounded-full border-2 border-white">
+                                        <img src="https://ui-avatars.com/api/?name=T3" alt="Team" class="w-6 h-6 rounded-full border-2 border-white">
+                                    </div>
+                                    <span class="text-sm text-gray-500">Due: Dec 20</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- More Project Cards -->
+                        <div class="project-card bg-white border border-gray-200 rounded-lg p-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 class="text-md font-semibold text-gray-900">Residential Complex</h3>
+                                    <p class="text-sm text-gray-500">Client: XYZ Developers</p>
+                                </div>
+                                <span class="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">Review</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Progress</span>
+                                    <span class="text-gray-900">90%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-500 rounded-full h-2 w-90" role="progressbar" title="Project Progress" aria-label="Project Progress: 90%" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex -space-x-2">
+                                        <img src="https://ui-avatars.com/api/?name=T4" alt="Team" class="w-6 h-6 rounded-full border-2 border-white">
+                                        <img src="https://ui-avatars.com/api/?name=T5" alt="Team" class="w-6 h-6 rounded-full border-2 border-white">
+                                    </div>
+                                    <span class="text-sm text-gray-500">Due: Dec 25</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Design Tasks -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Design Tasks</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                            <input type="checkbox" id="updateFloorPlans" name="updateFloorPlans" class="h-4 w-4 text-blue-500">
+                            <label for="updateFloorPlans" class="ml-3 flex-1">
+                                <h3 class="text-sm font-medium text-gray-900">Update floor plans for Office Building</h3>
+                                <p class="text-xs text-gray-500">Due today</p>
+                            </label>
+                            <span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">High Priority</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                            <input type="checkbox" id="create3DRenders" name="create3DRenders" class="h-4 w-4 text-blue-500">
+                            <label for="create3DRenders" class="ml-3 flex-1">
+                                <h3 class="text-sm font-medium text-gray-900">Create 3D renders for Residential Complex</h3>
+                                <p class="text-xs text-gray-500">Due tomorrow</p>
+                            </label>
+                            <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">Medium</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-span-4 space-y-6">
+                <!-- Design Resources -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Design Resources</h2>
+                    <div class="space-y-3">
+                        <a href="#" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-palette text-blue-500 mr-3"></i>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-900">Brand Guidelines</h3>
+                                <p class="text-xs text-gray-500">Updated 2 days ago</p>
+                            </div>
+                        </a>
+                        <a href="#" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-swatchbook text-green-500 mr-3"></i>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-900">Design System</h3>
+                                <p class="text-xs text-gray-500">Updated yesterday</p>
+                            </div>
+                        </a>
+                        <a href="#" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-vector-square text-purple-500 mr-3"></i>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-900">Asset Library</h3>
+                                <p class="text-xs text-gray-500">Updated 3 days ago</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <img src="https://ui-avatars.com/api/?name=John" alt="User" class="w-8 h-8 rounded-full">
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-gray-900">John approved your design for <span class="font-medium">Office Building</span></p>
+                                <p class="text-xs text-gray-500">2 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <img src="https://ui-avatars.com/api/?name=Mike" alt="User" class="w-8 h-8 rounded-full">
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-gray-900">Mike commented on <span class="font-medium">Residential Complex</span></p>
+                                <p class="text-xs text-gray-500">5 hours ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Members -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Team Members</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <img src="https://ui-avatars.com/api/?name=John+Smith" alt="Team" class="w-8 h-8 rounded-full">
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-gray-900">John Smith</h3>
+                                <p class="text-xs text-gray-500">Senior Designer</p>
+                            </div>
+                            <div class="ml-auto">
+                                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <img src="https://ui-avatars.com/api/?name=Emma+Wilson" alt="Team" class="w-8 h-8 rounded-full">
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-gray-900">Emma Wilson</h3>
+                                <p class="text-xs text-gray-500">3D Artist</p>
+                            </div>
+                            <div class="ml-auto">
+                                <span class="w-2 h-2 bg-gray-300 rounded-full"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Sidebar Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const mainContent = document.querySelector('main');
+        let sidebarOpen = true;
+
+        menuToggle.addEventListener('click', () => {
+            sidebarOpen = !sidebarOpen;
+            if (sidebarOpen) {
+                mainContent.style.marginLeft = '256px';
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+Create a new file named `styles.css` and add the following code:
+
+```css
+.project-card {
+    transition: transform 0.2s;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+}
+
+.design-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.stat-card {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.project-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}

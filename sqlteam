@@ -1,0 +1,260 @@
+-- API Functions for Common Operations
+
+-- Function to get employee details with manager info
+create or replace function get_employee_details(employee_id uuid)
+returns json as $$
+begin
+    return (
+        select json_build_object(
+            'employee', row_to_json(e),
+            'manager', row_to_json(m),
+            'training', (
+                select json_agg(row_to_json(t))
+                from public.employee_training et
+                join public.training_programs t on t.id = et.program_id
+                where et.employee_id = e.id
+            ),
+            'reviews', (
+                select json_agg(row_to_json(r))
+                from public.performance_reviews r
+                where r.employee_id = e.id
+            )
+        )
+        from public.employees e
+        left join public.employees m on m.id = e.manager_id
+        where e.id = employee_id
+    );
+end;
+$$ language plpgsql security definer;
+
+-- Function to get department statistics
+create or replace function get_department_stats(dept text)
+returns json as $$
+begin
+    return json_build_object(
+        'employee_count', (
+            select count(*) 
+            from public.employees 
+            where department = dept
+        ),
+        'avg_salary', (
+            select avg(salary)
+            from public.employees
+            where department = dept
+        ),
+        'open_positions', (
+            select count(*)
+            from public.job_positions
+            where department = dept
+            and status = 'open'
+        ),
+        'training_completion_rate', (
+            select 
+                count(case when status = 'completed' then 1 end)::float / 
+                count(*)::float * 100
+            from public.employee_training et
+            join public.employees e on e.id = et.employee_id
+            where e.department = dept
+        )
+    );
+end;
+$$ language plpgsql security definer;
+
+-- Function to process new job application
+create or replace function process_job_application(
+    p_position_id uuid,
+    p_applicant_name text,
+    p_email text,
+    p_resume_url text
+)
+returns json as $$
+declare
+    v_application_id uuid;
+begin
+    insert into public.job_applications (
+        position_id,
+        applicant_name,
+        email,
+        resume_url,
+        status
+    ) values (
+        p_position_id,
+        p_applicant_name,
+        p_email,
+        p_resume_url,
+        'received'
+    )
+    returning id into v_application_id;
+
+    -- Notify HR about new application
+    insert into public.notifications (
+        type,
+        title,
+        message,
+        recipient_id
+    )
+    select 
+        'new_application',
+        'New Job Application',
+        format('New application received for %s from %s', jp.title, p_applicant_name),
+        e.id
+    from public.employees e
+    cross join public.job_positions jp
+    where e.department = 'HR'
+    and jp.id = p_position_id;
+
+    return json_build_object(
+        'application_id', v_application_id,
+        'status', 'received',
+        'message', 'Application processed successfully'
+    );
+end;
+$$ language plpgsql security definer;
+
+-- Team Management for Gentry's Cabinets
+
+-- Department structure
+create table if not exists public.departments (
+    id uuid primary key default uuid_generate_v4(),
+    name text not null unique,
+    description text,
+    manager_id uuid references public.employees(id),
+    created_at timestamp with time zone default timezone('utc'::text, now()),
+    updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Team structure
+create table if not exists public.teams (
+    id uuid primary key default uuid_generate_v4(),
+    name text not null,
+    department_id uuid references public.departments(id),
+    leader_id uuid references public.employees(id),
+    created_at timestamp with time zone default timezone('utc'::text, now()),
+    updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Team members
+create table if not exists public.team_members (
+    id uuid primary key default uuid_generate_v4(),
+    team_id uuid references public.teams(id),
+    employee_id uuid references public.employees(id),
+    role text,
+    joined_date date default current_date,
+    created_at timestamp with time zone default timezone('utc'::text, now()),
+    updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Projects
+create table if not exists public.projects (
+    id uuid primary key default uuid_generate_v4(),
+    name text not null,
+    description text,
+    team_id uuid references public.teams(id),
+    status text default 'planning',
+    start_date date,
+    end_date date,
+    created_at timestamp with time zone default timezone('utc'::text, now()),
+    updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Team management functions
+create or replace function get_team_structure(dept_id uuid)
+returns json as $$
+begin
+    return (
+        select json_build_object(
+            'department', (select row_to_json(d) from public.departments d where d.id = dept_id),
+            'teams', (
+                select json_agg(team_data)
+                from (
+                    select 
+                        t.*,
+                        (
+                            select json_agg(row_to_json(e))
+                            from public.employees e
+                            join public.team_members tm on tm.employee_id = e.id
+                            where tm.team_id = t.id
+                        ) as members
+                    from public.teams t
+                    where t.department_id = dept_id
+                ) team_data
+            )
+        )
+    );
+end;
+$$ language plpgsql security definer;
+
+-- Team performance tracking
+create or replace function get_team_performance(team_id uuid)
+returns json as $$
+begin
+    return (
+        select json_build_object(
+            'team', (select row_to_json(t) from public.teams t where t.id = team_id),
+            'projects', (
+                select json_agg(row_to_json(p))
+                from public.projects p
+                where p.team_id = team_id
+            ),
+            'members', (
+                select json_agg(member_data)
+                from (
+                    select 
+                        e.*,
+                        (
+                            select count(*)
+                            from public.projects p
+                            where p.team_id = team_id
+                            and p.status = 'completed'
+                        ) as completed_projects
+                    from public.employees e
+                    join public.team_members tm on tm.employee_id = e.id
+                    where tm.team_id = team_id
+                ) member_data
+            )
+        )
+    );
+end;
+$$ language plpgsql security definer;
+
+-- Team communication
+create table if not exists public.team_announcements (
+    id uuid primary key default uuid_generate_v4(),
+    team_id uuid references public.teams(id),
+    author_id uuid references public.employees(id),
+    title text not null,
+    content text not null,
+    priority text default 'normal',
+    created_at timestamp with time zone default timezone('utc'::text, now()),
+    updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Triggers for team management
+create or replace function notify_team_changes()
+returns trigger as $$
+begin
+    insert into public.notifications (
+        type,
+        title,
+        message,
+        recipient_id
+    )
+    select 
+        'team_update',
+        'Team Update',
+        case TG_OP
+            when 'INSERT' then 'You have been added to ' || (select name from public.teams where id = NEW.team_id)
+            when 'DELETE' then 'You have been removed from ' || (select name from public.teams where id = OLD.team_id)
+            else 'Your team role has been updated'
+        end,
+        case TG_OP
+            when 'DELETE' then OLD.employee_id
+            else NEW.employee_id
+        end;
+    return NEW;
+end;
+$$ language plpgsql;
+
+create trigger team_member_changes
+    after insert or update or delete on public.team_members
+    for each row execute function notify_team_changes();

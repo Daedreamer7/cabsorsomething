@@ -1,0 +1,111 @@
+-- Sample Data for Gentry's Cabinets HR System
+
+-- Insert Departments
+insert into public.departments (name, description) values
+    ('Cabinet Production', 'Main cabinet manufacturing department'),
+    ('Installation', 'Cabinet installation and on-site service'),
+    ('Design', 'Cabinet design and customer consultation'),
+    ('Sales', 'Sales and customer relations'),
+    ('Administration', 'Administrative and HR functions');
+
+-- Insert Employees with roles
+insert into public.employees (
+    first_name, 
+    last_name, 
+    email, 
+    phone, 
+    department, 
+    position, 
+    role,
+    salary, 
+    hire_date
+) values
+    -- Keyholder
+    ('James', 'Gentry', 'james@gentryscabinets.com', '850-555-0100', 'Administration', 'Owner', 'keyholder', 120000, '2020-01-01'),
+    
+    -- Admins
+    ('Sarah', 'Johnson', 'sarah@gentryscabinets.com', '850-555-0101', 'Administration', 'HR Manager', 'admin', 75000, '2020-02-15'),
+    ('Michael', 'Rodriguez', 'michael@gentryscabinets.com', '850-555-0102', 'Cabinet Production', 'Production Manager', 'admin', 80000, '2020-03-01'),
+    
+    -- Managers
+    ('David', 'Smith', 'david@gentryscabinets.com', '850-555-0103', 'Installation', 'Installation Manager', 'manager', 65000, '2020-04-15'),
+    ('Lisa', 'Brown', 'lisa@gentryscabinets.com', '850-555-0104', 'Design', 'Design Team Lead', 'manager', 70000, '2020-05-01'),
+    ('Robert', 'Wilson', 'robert@gentryscabinets.com', '850-555-0105', 'Sales', 'Sales Manager', 'manager', 75000, '2020-06-15'),
+    
+    -- Regular employees
+    ('John', 'Davis', 'john@gentryscabinets.com', '850-555-0106', 'Cabinet Production', 'Cabinet Maker', 'employee', 45000, '2020-07-01'),
+    ('Emma', 'Martinez', 'emma@gentryscabinets.com', '850-555-0107', 'Design', 'Designer', 'employee', 50000, '2020-08-15'),
+    ('William', 'Anderson', 'william@gentryscabinets.com', '850-555-0108', 'Installation', 'Installer', 'employee', 45000, '2020-09-01'),
+    ('Jennifer', 'Taylor', 'jennifer@gentryscabinets.com', '850-555-0109', 'Sales', 'Sales Representative', 'employee', 55000, '2020-10-15');
+
+-- Insert Teams
+insert into public.teams (name, department_id, leader_id) 
+select 'Production Team A', d.id, e.id
+from public.departments d, public.employees e
+where d.name = 'Cabinet Production' and e.email = 'michael@gentryscabinets.com';
+
+insert into public.teams (name, department_id, leader_id)
+select 'Installation Team A', d.id, e.id
+from public.departments d, public.employees e
+where d.name = 'Installation' and e.email = 'david@gentryscabinets.com';
+
+-- Insert Team Members
+insert into public.team_members (team_id, employee_id, role)
+select t.id, e.id, 'Member'
+from public.teams t, public.employees e
+where t.name = 'Production Team A' and e.department = 'Cabinet Production';
+
+insert into public.team_members (team_id, employee_id, role)
+select t.id, e.id, 'Member'
+from public.teams t, public.employees e
+where t.name = 'Installation Team A' and e.department = 'Installation';
+
+-- Insert Projects
+insert into public.projects (name, description, team_id, status, start_date, end_date)
+select 
+    'Custom Kitchen Project',
+    'High-end custom kitchen cabinet installation',
+    t.id,
+    'in_progress',
+    current_date - interval '30 days',
+    current_date + interval '30 days'
+from public.teams t
+where t.name = 'Installation Team A';
+
+-- Insert Training Programs
+insert into public.training_programs (name, description, duration, status) values
+    ('Safety First', 'Basic workshop safety training', '1 week', 'active'),
+    ('Cabinet Making 101', 'Introduction to cabinet making', '2 weeks', 'active'),
+    ('Advanced Design', 'Advanced cabinet design techniques', '3 weeks', 'active'),
+    ('Customer Service', 'Customer service excellence', '1 week', 'active');
+
+-- Insert Employee Training Records
+insert into public.employee_training (employee_id, program_id, start_date, status)
+select 
+    e.id,
+    tp.id,
+    current_date - interval '14 days',
+    'in_progress'
+from public.employees e, public.training_programs tp
+where e.department = 'Cabinet Production' and tp.name = 'Safety First';
+
+-- Insert Documents
+insert into public.documents (title, type, category, file_url, uploaded_by) 
+select 
+    'Employee Handbook',
+    'PDF',
+    'HR',
+    'https://storage.example.com/documents/handbook.pdf',
+    e.id
+from public.employees e
+where e.email = 'sarah@gentryscabinets.com';
+
+-- Insert Notifications
+insert into public.notifications (type, title, message, recipient_id)
+select 
+    'training_reminder',
+    'Complete Safety Training',
+    'Please complete your safety training by next week',
+    e.id
+from public.employees e
+where e.department = 'Cabinet Production';

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gentry company</title>
+    <link rel="stylesheet" href="/src/index.css">
+    <link rel="stylesheet" href="/src/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF3366;
+            --primary-dark: #E61E4D;
+            --secondary: #2C3E50;
+            --accent: #FF9F43;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F8F9FA;
+        }
+        .app-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+        .sidebar {
+            background: var(--secondary);
+            color: white;
+            padding: 1.5rem;
+        }
+        .main-content {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .nav-item.active {
+            background: var(--primary);
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #F8F9FA;
+            border-radius: 8px;
+        }
+        .message {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        .message.sent {
+            justify-content: flex-end;
+        }
+        .message-content {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .message.sent .message-content {
+            background: var(--primary);
+            color: white;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .task-item:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .calendar {
+            height: 500px;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            animation: slideIn 0.3s ease-out;
+            z-index: 1000;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #E5E7EB;
+            margin-bottom: 1.5rem;
+        }
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-to-main">Skip to main content</a>
+    <div class="app-container">
+        <button type="button" id="menuToggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-sm" aria-label="Toggle Menu">
+            <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h1 class="text-xl font-bold mb-6">Communication Hub</h1>
+            <nav>
+                <div class="nav-item active" onclick="switchTab('messages')">
+                    <i class="fas fa-comments" aria-hidden="true"></i>
+                    <span>Messages</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('media')">
+                    <i class="fas fa-images" aria-hidden="true"></i>
+                    <span>Media</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('tasks')">
+                    <i class="fas fa-tasks" aria-hidden="true"></i>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('calendar')">
+                    <i class="fas fa-calendar" aria-hidden="true"></i>
+                    <span>Calendar</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('notes')">
+                    <i class="fas fa-sticky-note" aria-hidden="true"></i>
+                    <span>Notes</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('calls')">
+                    <i class="fas fa-phone" aria-hidden="true"></i>
+                    <span>Calls</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('projects')">
+                    <i class="fas fa-project-diagram" aria-hidden="true"></i>
+                    <span>Projects</span>
+                </div>
+            </nav>
+            
+            <div class="mt-auto pt-6">
+                <div class="nav-item" onclick="showModal('profile')">
+                    <i class="fas fa-user" aria-hidden="true"></i>
+                    <span>Profile</span>
+                </div>
+                <div class="nav-item" onclick="showModal('settings')">
+                    <i class="fas fa-cog" aria-hidden="true"></i>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main-content" class="main-content" role="main" tabindex="-1">
+            <!-- Messages Section -->
+            <div id="messages" class="tab-content active">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Messages</h2>
+                    <button class="btn" onclick="showModal('new-message')">
+                        New Message
+                    </button>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active">IM</div>
+                    <div class="tab">SMS</div>
+                    <div class="tab">Email</div>
+                    <div class="tab">Team</div>
+                </div>
+
+                <div class="chat-container">
+                    <div class="message received">
+                        <div class="message-content">
+                            <p class="font-medium">Alice</p>
+                            <p>Hey, how's the project going?</p>
+                            <p class="text-xs mt-1 opacity-75">10:30 AM</p>
+                        </div>
+                    </div>
+                    <div class="message sent">
+                        <div class="message-content">
+                            <p>Making good progress! Just finished the main features.</p>
+                            <p class="text-xs mt-1 opacity-75">10:32 AM</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form>
+                    <div class="flex mt-4">
+                        <div class="form-group">
+                            <label for="messageInput" class="sr-only">Type a message</label>
+                            <input type="text" 
+                                   id="messageInput"
+                                   name="message"
+                                   title="Message input field"
+                                   placeholder="Type a message..."
+                                   aria-label="Type a message"
+                                   class="flex-1 p-3 rounded-lg border border-gray-200 mr-2">
+                        </div>
+                        <button type="submit" class="btn" title="Send Message" aria-label="Send Message">Send</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Media Section -->
+            <div id="media" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Media</h2>
+                    <button class="btn" onclick="showModal('new-media')">
+                        Add Media
+                    </button>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active">Images</div>
+                    <div class="tab">Videos</div>
+                    <div class="tab">Audio</div>
+                </div>
+
+                <div class="media-container">
+                    <div class="media-item">
+                        <img src="https://picsum.photos/200/300" alt="Media Item">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Section -->
+            <div id="tasks" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Tasks</h2>
+                    <button class="btn" onclick="showModal('new-task')">
+                        Add Task
+                    </button>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active">My Tasks</div>
+                    <div class="tab">Team Tasks</div>
+                    <div class="tab">Completed</div>
+                </div>
+
+                <div class="task-list">
+                    <div class="task-item">
+                        <input type="checkbox" id="task1" name="task1" class="mr-3" title="Mark task as complete" aria-label="Complete project documentation task">
+                        <div class="flex-1">
+                            <h3 class="font-medium">Complete project documentation</h3>
+                            <p class="text-sm text-gray-500">Due tomorrow</p>
+                        </div>
+                        <span class="badge bg-red-100 text-red-800 px-2 py-1 rounded">High</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Section -->
+            <div id="calendar" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Calendar</h2>
+                    <button class="btn" onclick="showModal('new-event')">
+                        Add Event
+                    </button>
+                </div>
+
+                <div class="calendar" id="calendar-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            const isOpen = sidebar.classList.contains('open');
+            menuToggle.setAttribute('aria-expanded', isOpen);
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('open') && 
+                !sidebar.contains(e.target) && 
+                !menuToggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+                menuToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Initialize FullCalendar
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar-container');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: [
+                    {
+                        title: 'Team Meeting',
+                        start: '2024-01-15T10:00:00',
+                        end: '2024-01-15T11:30:00'
+                    }
+                ]
+            });
+            calendar.render();
+        });
+
+        // Tab Switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+        }
+
+        // Show Modal
+        function showModal(modalId) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2 class="text-xl font-bold mb-4">${modalId.replace('-', ' ').toUpperCase()}</h2>
+                    <button class="btn" onclick="this.closest('.modal').remove()">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Show Notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
